@@ -18,7 +18,7 @@ class GeneticAlgorithm():
         self.cross_func = cross_func if cross_func else geneticLib.crossoverFunc
         self.encoder = encoder if encoder else Encoding()
     
-    def run(self, functionName, maxGenerations = 10000, showLogs = True, trial = None, barData={}, writer=None):
+    def run(self, functionName, maxGenerations = 10000, showLogs = True, trial = None, barData={}, writer=None, startPopulation=None):
         """
         Finds a near-optimal solution in the search space using the given fitness function
         Returns a 3-tuple of (finalPopulation, bestTrap (encoded), bestFitness)
@@ -42,13 +42,32 @@ class GeneticAlgorithm():
                 for i, trap in enumerate(population)
             ]
 
+        # the format of startPopulation (take a list of traps and encode them)
+        # trap format found in legacy.designedTraps
+        # startPopulation = [encode(trap) for trap in [trap1, trap2, ...]]
+        if startPopulation:
+            print('A starting population has been found.')
+
         # Sampling the (encoded) population until we get one non-zero member
-        while(np.count_nonzero(fitnesses) == 0):
+        # (unless we provide a starting population)
+        while (not startPopulation and np.count_nonzero(fitnesses) == 0):
             population = geneticLib.initializePopulation(self.encoder)
             fitnesses = fitnessFunc(population, self.encoder)
         
         # Recalculate frequencies
         fitnesses = fitnessFunc(population, self.encoder)
+
+        if startPopulation:
+            print('A starting population has been found.')
+            print(f'There are {len(startPopulation)} individuals in the starting population')
+            print(
+                f'The average coherence of these traps is \
+                {np.average([functions.getCoherence(x) for x in startPopulation])}'
+            )
+            print(
+                f'The average lethality of these traps is \
+                {np.average([functions.getLethality(x) for x in startPopulation])}'
+            )
 
         generation = 0
         startTime = lastTime = time.time()
