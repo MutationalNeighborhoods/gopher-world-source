@@ -233,6 +233,8 @@ def plotMultiplePlots(num):
         LList += L
         originalC += [trapC]
         originalL += [trapL]
+
+    kernelDensityHistogram(CList, LList)
     
 
     
@@ -313,13 +315,15 @@ def probOfAbundantMutations(encoder, trap):
     return abundant_count / total_count  
 
 
-def kernelDensityHistogram():
-    model = KernelDensity
+def kernelDensityHistogram(deltaC, deltaL):
+    kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(deltaC)
+    log_density = kde.score_samples(deltaC[:3])
+    print(log_density)
 
 def main():    
     encoder = Encoding() 
     trap = getCoherentTraps(encoder)
-    print(probOfAbundantMutations(encoder, trap)))
+    # print(probOfAbundantMutations(encoder, trap))
     #multimutatedtraps = getMultiMutatedDict(encoder, 3, 4)
     #X,Y,V = getPolar(multimutatedtraps,4, 0)
     #X,Y,V = getPolar(sampleDictionary, 1,1)
@@ -327,12 +331,12 @@ def main():
     # trap = generateLethalTrap(encoder)
     #print(lethal_trap)
 
-    # trap = getCoherentTraps(encoder)
+    #trap = getCoherentTraps(encoder)
     #C, L = getSingleMutationCL(encoder, trap)
     #plotSingleMutants(encoder, trap)
 
     #plotTripleMutation(encoder, trap)
-    #plotMultiplePlots(10**1)
+    plotMultiplePlots(10**1)
 
   
 
