@@ -14,7 +14,7 @@ from collections import Counter
 import csv 
 from mpl_toolkits.mplot3d import Axes3D
 import math
-
+from legacy import designedTraps
 
 def generateMutated(encoder, trap, mutationFunction = library.mutationFunc, numMutants = 2000):
     """Generates a list of possible mutated traps produced from mutating the same trap"""
@@ -151,33 +151,6 @@ def scatterplot(ogCoherence, ogLethality,lethalityArr, coherenceArr):
     plt.show()
     plt.savefig('./plot1.png')
 
-"""
-def randomMutation(encoding: Encoding, trap):
-    '''Performs a mutation that is one of: substitution, deletion, insertion'''
-    mutationType = "sub"
-    rand1 = random.randrange(0, 1) * 3
-    if rand1 > 1:
-        mutationType = "del"
-    elif rand1 > 2:
-        mutationType = "ins"
-
-    if mutationType == "sub":
-        return library.mutationFunc(encoding, trap)
-
-    else: 
-        index = random.randrange(0, len(trap), 1)
-        while index in (encoding.food, encoding.floor, encoding.door):
-            index = random.randrange(0, len(trap), 1)
-
-        if mutationType == "del":
-            trap = trap[:index] + trap[index+1:]
-
-        elif mutationType == "ins":
-            trap = trap[:index] + [constants.CELL_ALPHABET[random.randrange(2, len(constants.CELL_ALPHABET), 1)]] + trap[index+1:]
-
-    return np.array(trap)
-"""
-
 def getCoherentTraps(encoder):
     while True:
         trap = library.generateTrap()
@@ -228,12 +201,6 @@ def driveMultiMutatedTraps(encoder,numMutants,numLevel):
     trap = getCoherentTraps(encoder)
     data = recurseMultiMutatedTraps(trap, encoder, numMutants, numLevel)
     return data
-'''
-trap1 -> (coh, let, level)=levelData
-
-(levelData, [(levelData,)] )
-    
-'''
 
 def getPolarTraps(obj, levels, attributeName):
     #items = dictionary.items()

@@ -15,6 +15,11 @@ import csv
 from mpl_toolkits.mplot3d import Axes3D
 import math
 import random
+from legacy.designedTraps import traps
+from sklearn.neighbors import KernelDensity
+
+encoding = Encoding()
+traps = [encoding.encode(trap) for trap in traps]
 
 
 def superControlledSubstitution(location, encoding: Encoding, trap, mutation):
@@ -72,18 +77,15 @@ def getCoherenceAndLethality(encoder, trap):
 def generateLethalTrap(encoder):
     best_lethality = 0
     best_trap = None
-    num = 0
-
-    while num < 100:
+    num = 1
+    while num < 10 ** 2:
         trap = library.generateTrap()
-        listMutants = generateAllMutantsAtCell(encoder, trap)
-        for mutant in listMutants:
-            coherence, lethality = getCoherenceAndLethality(encoder, mutant)
-            if lethality > best_lethality:
-                best_lethality = lethality
-                best_trap = mutant
+        coherence, lethality = getCoherenceAndLethality(encoder, trap)
+        if lethality > best_lethality:
+            best_lethality = lethality
+            best_trap = trap
         num += 1
-
+    print(best_lethality)
     return best_trap
 
 
@@ -100,29 +102,16 @@ def scatterplot(ogCoherence, ogLethality, coherenceArr, lethalityArr):
     plt.show()
     plt.savefig('./plot1.png')
     
-def histogram(ogCoherence, ogLethality, coherenceArr, lethalityArr, title):
+def histogram(ogCoherence, ogLethality, coherenceArr, lethalityArr, numBins):
 
-    numoriginal = int(len(lethalityArr)/100)
 
     plt.figure(2)
     fig = plt.figure()
     fig.suptitle("Lethality")
-    arr = [[lethalityArr] ,[ogLethality]*numoriginal]
-    arr = np.array(arr)
+    arr = np.array(lethalityArr)
     ax = plt.gca()
-    n, bins, patches = ax.hist(arr, density = True, bins=20,  histtype='bar', stacked = True)
-    bar_value_to_label = ogLethality
-    """print("ogLethality", ogLethality)
-    min_distance = float("inf")  # initialize min_distance with infinity
-    index_of_bar_to_label = 0
-    for i, rectangle in enumerate(patches):  # iterate over every bar
-        tmp = abs( (rectangle.get_x() +(rectangle.get_width() * (1 / 2))) - bar_value_to_label)
-        if tmp < min_distance: 
-            min_distance = tmp
-            index_of_bar_to_label = i
-    
-    patches[index_of_bar_to_label].set_color('b')
-    print("minDistance", min_distance)"""
+    ax.hist(arr, density = True, bins=numBins,  histtype='bar')
+    print("ogLehtality", ogLethality)
     plt.show()
     plt.savefig('./plot2.png')
 
@@ -130,23 +119,10 @@ def histogram(ogCoherence, ogLethality, coherenceArr, lethalityArr, title):
     plt.figure(3)
     fig = plt.figure()
     fig.suptitle("Coherence")
-    arr = [[coherenceArr] ,[ogCoherence]*numoriginal]
-    arr = np.array(arr)
+    arr = np.array(coherenceArr)
     ax = plt.gca()
-    n, bins, patches = ax.hist(arr, density = True, bins=20,  histtype='bar', stacked = True)  
-    bar_value_to_label = ogCoherence
+    ax.hist(arr, density = True, bins=numBins,  histtype='bar')  
     print("ogCoherence", ogCoherence)
-    """min_distance = float("inf")  # initialize min_distance with infinity
-    index_of_bar_to_label = 0
-    for i, rectangle in enumerate(patches):  # iterate over every bar
-        tmp = abs( (rectangle.get_x() +(rectangle.get_width() * (1 / 2))) - bar_value_to_label)
-        if tmp < min_distance: 
-            min_distance = tmp
-            index_of_bar_to_label = i
-    
-    patches[index_of_bar_to_label].set_color('b')
-    print("minDistance", min_distance)"""
-
     plt.show()
     plt.savefig('./plot3.png')
 
@@ -219,7 +195,7 @@ def plotSingleMutants(encoder, trap):
     trapC, trapL = getCoherenceAndLethality(encoder, trap)
     print(trapC, trapL)
     scatterplot(trapC, trapL, C, L)
-    histogram(trapC, trapL, C, L, "Single Mutation")
+    histogram(trapC, trapL, C, L, 100)
 
 def plotDoubleMutation(encoder, trap):
     print(trap)
@@ -227,7 +203,7 @@ def plotDoubleMutation(encoder, trap):
     trapC, trapL = getCoherenceAndLethality(encoder, trap)
     print(trapC, trapL)
     scatterplot(trapC, trapL, C, L)
-    histogram(trapC, trapL, C, L, "Double Mutation")
+    histogram(trapC, trapL, C, L, 100)
 
 def plotTripleMutation(encoder, trap):
     print(trap)
@@ -237,7 +213,7 @@ def plotTripleMutation(encoder, trap):
     C = returnsDeltaChangeList(C, trapC)
     L = returnsDeltaChangeList(L, trapL)
     scatterplot(trapC, trapL, C, L)
-    histogram(trapC, trapL, C, L, "Triple Mutation")
+    histogram(trapC, trapL, C, L, 100)
 
 
 def plotMultiplePlots(num):
@@ -249,14 +225,18 @@ def plotMultiplePlots(num):
     for i in range(num):
         print(i)
         trap = getCoherentTraps(encoder)
-        C,L = getTripleMutationCL(encoder, trap, 10000)
+        C,L = getSingleMutationCL(encoder, trap)
         trapC, trapL = getCoherenceAndLethality(encoder, trap)
+        C = returnsDeltaChangeList(C, trapC)
+        L = returnsDeltaChangeList(L, trapL)
         CList += C
         LList += L
         originalC += [trapC]
         originalL += [trapL]
     
-    multHistogram(originalC, originalL, CList, LList, "hi")
+
+    
+    histogram(originalC, originalL, CList, LList, 100)
 
 
 def multHistogram(ogCoherence, ogLethality, coherenceArr, lethalityArr,  title):
@@ -299,9 +279,47 @@ def returnsDeltaChangeList(list, originalPoint):
     
     return newList
 
+def filterLethality(encoder, population):
+    count0 = 0
+    count1 = 0
+    count2 = 0
+    count3 = 0
+    count4 = 0
+    for trap in population:
+        coherence, lethality = getCoherenceAndLethality(encoder, trap)
+        if lethality < 0.2:
+            count0 += 1
+        elif lethality < 0.4:
+            count1 += 1
+        elif lethality < 0.6:
+            count2 += 1
+        elif lethality < 0.8:
+            count3 += 1
+        else:
+            count4 += 1
+    return [count0, count1, count2, count3, count4] 
+
+def probOfAbundantMutations(encoder, trap):
+    mutList = getSingleMutationCL(encoder, trap)
+    origCoherence, origLethality = getCoherenceAndLethality(encoder, trap)
+    abundant_count = 0
+    total_count = len(mutList)
+   
+    for mutation in mutList:
+        coherence, lethality = getCoherenceAndLethality(encoder, mutation)
+        if lethality > origLethality:
+            abundant_count += 1
+
+    return abundant_count / total_count  
+
+
+def kernelDensityHistogram():
+    model = KernelDensity
+
 def main():    
     encoder = Encoding() 
     trap = getCoherentTraps(encoder)
+    print(probOfAbundantMutations(encoder, trap)))
     #multimutatedtraps = getMultiMutatedDict(encoder, 3, 4)
     #X,Y,V = getPolar(multimutatedtraps,4, 0)
     #X,Y,V = getPolar(sampleDictionary, 1,1)
@@ -313,9 +331,8 @@ def main():
     #C, L = getSingleMutationCL(encoder, trap)
     #plotSingleMutants(encoder, trap)
 
-    plotTripleMutation(encoder, trap)
-    #plotMultiplePlots(50)
-
+    #plotTripleMutation(encoder, trap)
+    #plotMultiplePlots(10**1)
 
   
 
