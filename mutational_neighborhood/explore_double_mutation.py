@@ -33,4 +33,7 @@ with open(input_df_name,'r') as read_f:
                             write_f.write(','.join([fmt_trap(trap),str(coh),str(let),org_trap_str])+'\n')
                     trap[location2] = org_val2
                 trap[location] = org_val
+            write_f.flush()
+            os.fsync(write_f.fileno())
+
 os.system(f'rm {input_df_name}')

@@ -234,7 +234,7 @@ def plotMultiplePlots(num):
         originalC += [trapC]
         originalL += [trapL]
 
-    kernelDensityHistogram(CList, LList)
+    #kernelDensityHistogram(CList, LList)
     
 
     
