@@ -343,8 +343,8 @@ def kernelDensityHistogram(deltaC, deltaL):
 
 def main():    
     encoder = Encoding() 
-    #trapList = traps
-    trapList = []
+    trapList1 = traps
+    trapList2 = []
     for i in range(20):
         trapList.append(generateLethalTrap(encoder))
     for i in range(20):
@@ -362,7 +362,8 @@ def main():
     #plotSingleMutants(encoder, trap)
 
     #plotTripleMutation(encoder, trap)
-    plotProbOfBeneficialMuts(encoder, trapList)
+    plotProbOfBeneficialMuts(encoder, trapList1)
+    plotProbOfBeneficialMuts(encoder, trapList2)
     #plotMultiplePlots(10**1)
 
   
