@@ -59,7 +59,7 @@ def getSingleMutationCL(encoder, trap):
 
 
 def getCoherentTraps(encoder):
-    coh = random.uniform(0.05, 0.3)
+    coh = random.uniform(0.1, 0.4)
     while True:
         trap = library.generateTrap()
         coherence, lethality = getCoherenceAndLethality(encoder, trap)
@@ -301,18 +301,39 @@ def filterLethality(encoder, population):
             count4 += 1
     return [count0, count1, count2, count3, count4] 
 
-def probOfAbundantMutations(encoder, trap):
-    mutList = getSingleMutationCL(encoder, trap)
-    origCoherence, origLethality = getCoherenceAndLethality(encoder, trap)
+def probOfBeneficialMutations(encoder, trap):
+    mutCoherence, mutLethality = getSingleMutationCL(encoder, trap)
+    origLethality = fitnessFunctions.getLethality(trap, encoder)
     abundant_count = 0
-    total_count = len(mutList)
+    total_count = len(mutLethality)
    
-    for mutation in mutList:
-        coherence, lethality = getCoherenceAndLethality(encoder, mutation)
-        if lethality > origLethality:
+    for mutation in mutLethality:
+        if mutation > origLethality:
             abundant_count += 1
 
     return abundant_count / total_count  
+
+def plotProbOfBeneficialMuts(encoder, traps):
+    cohList = []
+    letList = []
+    probList = []
+
+    for trap in traps:
+        cohList.append(fitnessFunctions.getCoherence(trap, encoder))
+        letList.append(fitnessFunctions.getLethality(trap, encoder))
+        probList.append(probOfBeneficialMutations(encoder, trap))
+
+    plt.figure(1)
+    plt.scatter(cohList, probList)
+    plt.xlabel("Coherence")
+    plt.ylabel("Probability of Beneficial Mutation")
+    plt.show()
+
+    plt.figure(2)
+    plt.scatter(letList, probList)
+    plt.xlabel("Lethality")
+    plt.ylabel("Probability of Beneficial Mutations")
+    plt.show()
 
 
 def kernelDensityHistogram(deltaC, deltaL):
@@ -322,7 +343,12 @@ def kernelDensityHistogram(deltaC, deltaL):
 
 def main():    
     encoder = Encoding() 
-    trap = getCoherentTraps(encoder)
+    #trapList = traps
+    trapList = []
+    for i in range(20):
+        trapList.append(generateLethalTrap(encoder))
+    for i in range(20):
+        trapList.append(getCoherentTraps(encoder))
     # print(probOfAbundantMutations(encoder, trap))
     #multimutatedtraps = getMultiMutatedDict(encoder, 3, 4)
     #X,Y,V = getPolar(multimutatedtraps,4, 0)
@@ -336,7 +362,8 @@ def main():
     #plotSingleMutants(encoder, trap)
 
     #plotTripleMutation(encoder, trap)
-    plotMultiplePlots(10**1)
+    plotProbOfBeneficialMuts(encoder, trapList)
+    #plotMultiplePlots(10**1)
 
   
 
