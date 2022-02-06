@@ -1,6 +1,6 @@
 import sys
 import os
-from utils import *
+from mutational_neighborhood.utils import *
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import gaussian_kde
