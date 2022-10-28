@@ -1,0 +1,71 @@
+body {
+    background-color: rgb(187, 187, 187);
+}
+
+.board {
+    position: absolute;
+    left: 0.6vw;
+    top: 3vw;
+    height: 44vw;
+    width: 44vw;
+    border: solid 2px black;
+   /* background: rgb(170, 170, 170);*/
+}
+
+#player {
+    background-color: black;
+    left: 15.35vw;
+    top: 30.35vw;
+}
+
+.arena {
+    position: absolute;
+    left: 5vw;
+    top: 5vw;
+    width: 43.4vw;
+    border: solid .1vw gray;
+    height: 47vw;
+    border-radius: 7px;
+    background-color: rgb(136, 136, 136);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 1vw;
+}
+
+.square {
+    position: absolute;
+    /*background-color: rgb(170, 170, 170);*/
+    outline: 1px solid rgb(10, 10, 10); 
+    height: 4vw;
+    width: 4vw;
+}
+
+.character {
+    color: white;
+    position: absolute;
+    width: 2.3vw;
+    height: 2.3vw;
+    border-radius: 1.15vw;
+    font-family: 'Lato', sans-serif;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    font-size: 1.4vw;
+    text-align: center;
+    line-height: 2.3vw;
+    display: none;
+}
+
+.algorithmbutton {
+    color: white;
+    position: absolute;
+    width: 11vw;
+    height: 7vw;
+    border-radius: 1.15vw;
+    background-color: black;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.travelBar {
+    position: absolute;
+    border: solid 2px black;
+    height: 4vw;
+    width: 40vw;
+}
